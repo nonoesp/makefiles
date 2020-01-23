@@ -1,0 +1,26 @@
+# Requires ffmpeg
+
+FRAMES=8
+DATE_NOW=`date '+%y%m%d_%H%M%S'`
+
+all:
+	@make extract
+	@make palette
+	@make gif
+	@make archive
+
+palette:
+	@ffmpeg -y -i frames/f_%02d.jpg -vf palettegen palette.png
+
+gif:
+	@ffmpeg -r $(FRAMES) -y -i frames/f_%02d.jpg -i palette.png -filter_complex "paletteuse" animation.gif
+
+extract:
+	@rm -rf ./frames
+	@mkdir ./frames
+	@ffmpeg -i video.mov -vf fps=$(FRAMES) frames/f_%02d.jpg
+
+archive:
+	@mkdir $(DATE_NOW)_gif-$(n)
+	@mv video.mov $(DATE_NOW)_gif-$(n)
+	@mv animation.gif $(DATE_NOW)_gif-$(n)
